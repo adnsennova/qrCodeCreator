@@ -1,15 +1,16 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import Layout from "../layouts/Layout_validate_user.astro";
 import Navbar from "../components/Navbar.astro";
-import FormRegister from "../components/FormRegister.astro";
+import FormLogin from "../components/FormLogin.astro";
+
 ---
 
-<Layout title="QR CODE CREATOR">
+<Layout title="QR CODE CREATOR - login">
     <Navbar />
     <div class="flex justify-center items-center flex-col">
         <h1 class="text-3xl font-bold text-white w-full flex justify-center">
             Hello world! 🍾
         </h1>
-        <FormRegister />
+        <FormLogin />
     </div>
 </Layout>

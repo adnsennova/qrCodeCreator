@@ -30,20 +30,38 @@ exports.crear_usuario = async (req, res) => {
 
 // Función para validar un usuario
 exports.validar_usuario = async (req, res) => {
-    const { correo } = req.body;
+    const { correo, contrasena } = req.body; // También recibimos la contraseña ingresada por el usuario
 
     try {
-        // Buscamos el usuario por correo
+        // Buscamos el usuario por correo y obtenemos contrasena, id, nombre, y correo
         const [rows] = await pool.execute(
-            'SELECT contrasena FROM users WHERE correo = ?',
+            'SELECT contrasena, id, nombre, correo FROM users WHERE correo = ?',
             [correo]
         );
 
         if (rows.length === 0) {
-            return res.status(404).json({ message: 'Usuario no encontrado' })
+            return res.status(404).json({ message: 'Usuario no encontrado' });
         }
-        // Devolvemos la contraseña (hash) para validación en otro lado
-        res.json({ contrasena: rows[0].contrasena });
+
+        // Comparar la contraseña ingresada con el hash almacenado
+        const validPassword = await bcrypt.compare(contrasena, rows[0].contrasena);
+
+        if (!validPassword) {
+            return res.status(401).json({ message: 'Contraseña incorrecta', status: 401 });
+        }
+
+        // Verificar los valores antes de enviarlos
+        console.log('ID:', rows[0].id);        // Asegúrate de que este valor es el ID y no el correo
+        console.log('Correo:', rows[0].correo); // Verificar que este es el correo correcto
+
+        // Si la contraseña es correcta, enviamos los datos correctos
+        res.json({
+            message: "Inicio de sesión exitoso",
+            userId: rows[0].id,     // Aquí debe ir el ID, asegúrate que es el ID correcto
+            nombre: rows[0].nombre,
+            correo: rows[0].correo, // Enviamos también el correo si es necesario
+            status: 200
+        });
     } catch (error) {
         res.status(500).json({ message: 'Error al validar usuario', error });
     }
