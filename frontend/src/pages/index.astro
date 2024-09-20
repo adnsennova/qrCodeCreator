@@ -1,8 +1,15 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import Form from "../components/Form.astro";
 ---
 
 <Layout title="QR CODE CREATOR">
-	
+    <Navbar />
+    <div class="flex justify-center items-center flex-col">
+        <h1 class="text-3xl font-bold text-white w-full flex justify-center">
+            Hello world! 🍾
+        </h1>
+        <Form/>
+    </div>
 </Layout>

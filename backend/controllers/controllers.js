@@ -18,8 +18,8 @@ exports.crear_usuario = async (req, res) => {
 
         // Guardamos el usuario
         const [result] = await pool.execute(
-            'INSERT INTO  usuarios (correo, nombre, contrasena) VALUES (?,?,?)',
-            [correo,nombre, hashedPassword]
+            'INSERT INTO  users (correo, nombre, contrasena) VALUES (?,?,?)',
+            [correo, nombre, hashedPassword]
         );
 
         res.status(201).json({ message: 'Usuario creado', userId: result.insertId });
@@ -35,12 +35,12 @@ exports.validar_usuario = async (req, res) => {
     try {
         // Buscamos el usuario por correo
         const [rows] = await pool.execute(
-            'SELECT contrasena FROM usuarios WHERE correo = ?',
+            'SELECT contrasena FROM users WHERE correo = ?',
             [correo]
         );
 
-        if(rows.length === 0){
-            return res.status(404).json({message: 'Usuario no encontrado'})
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Usuario no encontrado' })
         }
         // Devolvemos la contraseña (hash) para validación en otro lado
         res.json({ contrasena: rows[0].contrasena });
