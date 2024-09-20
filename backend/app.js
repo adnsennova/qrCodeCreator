@@ -1,17 +1,18 @@
-const express = require('express');
 const cors = require('cors');
-const routes = require('./routes/routes'); // Importamos las rutas definidas en routes.js
+const express = require('express');
+const cookieParser = require('cookie-parser'); // Importa cookie-parser
 const app = express();
+const routes = require('./routes/routes'); // Asegúrate de importar tus rutas
 
-// Middleware
-app.use(cors()); // Configura CORS
-app.use(express.json()); // Parseo de JSON
+// Middleware para analizar las cookies
+app.use(cors());
+app.use(cookieParser());
+app.use(express.json()); // Si estás usando JSON en tus solicitudes
 
-// Rutas
-app.use('/api', routes); // Usamos las rutas definidas en routes.js con prefijo '/api'
+// Usa las rutas
+app.use('/api', routes); // Cambia '/api' por el prefijo que necesites
 
-// Inicialización del servidor
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
