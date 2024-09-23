@@ -1,10 +1,11 @@
-// middleware/auth.js
-function isAuthenticated(req, res, next) {
-    const userId = req.cookies.userId;
-    if (!userId) {
-        return res.redirect('/login');
-    }
-    next();
-}
+const axios = require('axios');
 
-module.exports = isAuthenticated;
+const api = axios.create({
+  baseURL: 'http://localhost:3000/api',
+  withCredentials: true
+});
+
+// Ejemplo de uso:
+// api.get('/ruta').then(response => console.log(response.data));
+
+module.exports = api;

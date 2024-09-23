@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const QRCode = require('qrcode');
-const pool = require('../db/db.js')
+const pool = require('../db/db.js');
+const { log } = require('console');
 
 // Ejemplo de base de datos en memoria para usuarios y QR
 const users = [];
@@ -69,42 +70,57 @@ exports.validar_usuario = async (req, res) => {
 
 // Función para crear un QR
 exports.crear_qr = async (req, res) => {
+    console.log('Iniciando crear_qr');
     const { id_usuario, url, nombre_qr, color = '#000000', tamano = 300 } = req.body;
+    console.log('Datos recibidos:', { id_usuario, url, nombre_qr, color, tamano });
 
     try {
-        // Buscamos el usuario
-        const user = users.find(user => user.id === parseInt(id_usuario));
-        if (!user) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
+        let qrPath;
+        console.log('Buscando usuario');
+        const [row] = await pool.execute(
+            'SELECT id FROM users WHERE id = ?',
+            [id_usuario]
+        );
+        if (row.length === 0) {
+            return res.status(404).json({ message: 'usuario no encontrado' })
         }
+        console.log(`id recibido de consulta: ${row[0].id} || id del cuerpo: ${id_usuario}`);
+        
+        if (row[0].id) {
+            
+            console.log('Creando carpeta del usuario');
+            const userFolder = `./public/user_folder_${id_usuario}`;
+    
+            if (!fs.existsSync(userFolder)) {
+                fs.mkdirSync(userFolder);
+                console.log('Carpeta creada:', userFolder);
+            } else {
+                console.log('La carpeta ya existe');
+            }
 
-        // Creamos la carpeta del usuario si no existe
-        const userFolder = `../public/user_folder_${id_usuario}`;
-        if (!fs.existsSync(userFolder)) {
-            fs.mkdirSync(userFolder);
+            qrPath = path.join(userFolder, `${nombre_qr}.png`);
+            console.log('Ruta del QR:', qrPath);
+
+            console.log('Generando código QR');
+            await QRCode.toFile(qrPath, url, {
+                color: {
+                    dark: color,
+                    light: '#FFFFFF'
+                },
+                width: tamano
+            });
+            console.log('Código QR generado');
+
+            qrs.push({ id_usuario, nombre_qr, path: qrPath });
+            console.log('QR guardado en memoria');
         }
-
-        // Ruta donde se guardará el QR
-        const qrPath = path.join(userFolder, `${nombre_qr}.png`);
-
-        // Generamos el código QR
-        await QRCode.toFile(qrPath, url, {
-            color: {
-                dark: color,  // Color del QR
-                light: '#FFFFFF'  // Fondo blanco
-            },
-            width: tamano
-        });
-
-        // Guardamos el QR en nuestro "array" de memoria
-        qrs.push({ id_usuario, nombre_qr, path: qrPath });
 
         res.status(201).json({ message: 'QR creado', qrPath });
     } catch (error) {
-        res.status(500).json({ message: 'Error al crear QR', error });
+        console.error('Error en crear_qr:', error);
+        res.status(500).json({ message: 'Error al crear QR', error: error.message });
     }
 };
-
 // Función para traer QR de un usuario
 exports.traer_qr = async (req, res) => {
     const { id_usuario } = req.query;
