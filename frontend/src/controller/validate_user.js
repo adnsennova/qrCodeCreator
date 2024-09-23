@@ -32,9 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const result = await response.json();
             console.log(result);
 
-            if (result.error) {
+            if (result.status === 401) {
                 Toastify({
-                    text: result.error.message,
+                    text: result.message,
                     style: {
                         background: "red"
                     },
