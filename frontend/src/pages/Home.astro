@@ -1,0 +1,17 @@
+---
+import LayoutHome from "../layouts/Layout_home.astro";
+import Navbar from "../components/Navbar.astro";
+---
+
+<LayoutHome title="Home">
+    <Navbar />
+    <div class="flex justify-center items-center flex-col w-full h-full">
+        <h1 class="text-3xl font-bold text-white w-full flex justify-center">
+            Hello world! your name is: <span id="name-home" class="text-white text-2xl p-8"></span>🍾
+        </h1>
+    </div>
+</LayoutHome>
+
+<script>
+    document.querySelector("#name-home").textContent = "stiven";
+</script>

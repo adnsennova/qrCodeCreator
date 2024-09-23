@@ -65,6 +65,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         y: 10
                     },
                 }).showToast();
+
+                setInterval(() => {
+                    location.href = "/Home";
+                }, 2000);
             }
 
 
