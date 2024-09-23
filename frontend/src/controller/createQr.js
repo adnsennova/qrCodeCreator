@@ -38,6 +38,17 @@ document.getElementById('qrForm').addEventListener('submit', async function (eve
             resultMessage.classList.remove('hidden', 'text-red-500');
             resultMessage.classList.add('text-green-500');
             resultMessage.innerText = `QR generado exitosamente: ${result.qrPath}`;
+
+            Toastify({
+                text: `QR generado exitosamente: ${result.qrPath}`,
+                style: {
+                    background: "green"
+                },
+                offset: {
+                    x: 50,
+                    y: 10
+                },
+            }).showToast();
         } else {
             throw new Error(result.message || 'Error desconocido');
         }
