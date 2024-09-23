@@ -49,6 +49,10 @@ document.getElementById('qrForm').addEventListener('submit', async function (eve
                     y: 10
                 },
             }).showToast();
+
+            setInterval(() => {
+                // location.href = "/Home";
+            }, 2000);
         } else {
             throw new Error(result.message || 'Error desconocido');
         }

@@ -85,12 +85,12 @@ exports.crear_qr = async (req, res) => {
             return res.status(404).json({ message: 'usuario no encontrado' })
         }
         console.log(`id recibido de consulta: ${row[0].id} || id del cuerpo: ${id_usuario}`);
-        
+
         if (row[0].id) {
-            
+
             console.log('Creando carpeta del usuario');
             const userFolder = `./public/user_folder_${id_usuario}`;
-    
+
             if (!fs.existsSync(userFolder)) {
                 fs.mkdirSync(userFolder);
                 console.log('Carpeta creada:', userFolder);
@@ -101,6 +101,12 @@ exports.crear_qr = async (req, res) => {
             qrPath = path.join(userFolder, `${nombre_qr}.png`);
             console.log('Ruta del QR:', qrPath);
 
+            // Validar si el archivo ya existe
+            if (fs.existsSync(qrPath)) {
+                console.log('Error: El archivo ya existe');
+                return res.status(400).json({ message: 'Ya existe un QR con ese nombre. Por favor, elige otro nombre.' });
+            }
+   
             console.log('Generando código QR');
             await QRCode.toFile(qrPath, url, {
                 color: {
@@ -109,6 +115,7 @@ exports.crear_qr = async (req, res) => {
                 },
                 width: tamano
             });
+
             console.log('Código QR generado');
 
             qrs.push({ id_usuario, nombre_qr, path: qrPath });
