@@ -4,16 +4,20 @@
     <div
         class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
     >
-        <a
-            href="/"
-            class="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-            <span class="h-8"> 📱 </span>
-            <span
-                class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
-                >QR Creator</span
-            >
-        </a>
+    <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse flex-row min-w-[30vw]">
+        <lord-icon
+            src="../../public/qr.json"
+            trigger="loop"
+            stroke="light"
+            class="w-[50px] h-[50px]"
+            state="hover-pinch"
+            colors="primary:#3080e8,secondary:#b4b4b4">
+        </lord-icon>
+        <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+            QR Creator
+        </span>
+    </a>
+    
         <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
             <button
                 id="register-btn"
@@ -24,7 +28,7 @@
             <button
                 id="login-btn"
                 type="button"
-                class=" text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 ><a href="Login">Iniciar sesion</a></button
             >
             <button
@@ -82,14 +86,11 @@
                         >Contacto</a
                     >
                 </li>
-           
             </ul>
-            
         </div>
 
         <script>
             document.addEventListener("DOMContentLoaded", (event) => {
-
                 function getCookie(name) {
                     const value = `; ${document.cookie}`;
                     const parts = value.split(`; ${name}=`);
@@ -101,9 +102,13 @@
                     "#login-btn",
                 ) as HTMLButtonElement;
                 const my_qr = document.querySelector("#my_qr") as HTMLElement;
-                const create_qr = document.querySelector("#create_qr") as HTMLElement;
-                const contact = document.querySelector("#contact") as HTMLElement;
-                 const registerBtn = document.querySelector(
+                const create_qr = document.querySelector(
+                    "#create_qr",
+                ) as HTMLElement;
+                const contact = document.querySelector(
+                    "#contact",
+                ) as HTMLElement;
+                const registerBtn = document.querySelector(
                     "#register-btn",
                 ) as HTMLButtonElement;
                 if (getCookie("userId")) {
