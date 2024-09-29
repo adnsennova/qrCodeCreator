@@ -1,49 +1,215 @@
 ---
-import LayoutHome from "../layouts/Layout_home.astro";
+// Dashboard.astro
+import { Image } from "astro:assets";
 import Navbar from "../components/Navbar.astro";
+// Simulación de datos de usuario (en una aplicación real, esto vendría de una base de datos o API)
+const userName = ["Alice", "Bob", "Charlie", "David", "Eve"][
+    Math.floor(Math.random() * 5)
+];
 ---
 
-<LayoutHome title="Home">
-    <Navbar />
-    <div class="flex h-screen bg-gray-100">
-        <!-- Sidebar -->
-        <div class="w-80 bg-slate-800 shadow-md p-6">
-            <div class="mb-8">
-                <h2 class="text-2xl font-semibold text-white">User Info</h2>
-            </div>
-            <nav class="space-y-6">
-                <div class="flex flex-col items-center">
-                    <div title="" class="rounded-full w-32 h-32 bg-blue-300 mb-4"></div>
-                    <p class="text-white text-lg font-medium text-center break-words w-full" id="name_profile"></p>
-                    <p class="text-red-600 hover:text-red-800 cursor-pointer text-lg font-medium text-center break-words w-full" id="close_sec">💢 Cerrar sesion</p>
-                </div>
-                <!-- Add more user info here as needed -->
-            </nav>
+<Navbar />
+<div class="flex h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <aside
+        id="sidebar"
+        class="w-0 md:w-80 bg-slate-800 shadow-md p-6 transition-all duration-300 overflow-hidden"
+    >
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-white">User Info</h2>
         </div>
-    
-        <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top bar if needed -->
-            <header class="bg-white shadow-md">
-                <div class="max-w-7xl mx-auto py-4 px-6">
-                    <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
-                </div>
-            </header>
-    
-            <!-- Main content -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-pink-300">
-                <div class="container mx-auto px-6 py-8">
-                    <div class="flex justify-center items-center flex-col w-full min-h-screen bg-pink-300">
-                        <h1 class="text-3xl font-bold text-white w-full flex justify-center">
-                            Hello world! your name is: <span id="name-home" class="text-white text-2xl p-8"></span>
-                        </h1>
+        <nav class="space-y-6">
+            <div class="flex flex-col items-center">
+                <Image
+                    src={`https://picsum.photos/128?random=${Math.random()}`}
+                    alt="Profile"
+                    width={128}
+                    height={128}
+                    class="rounded-full w-32 h-32 mb-4 object-cover"
+                />
+                <p
+                    class="text-white text-lg font-medium text-center break-words w-full"
+                    id="name_profile"
+                >
+                    {userName}
+                </p>
+                <button
+                    id="close_sec"
+                    class="text-red-600 hover:text-red-800 cursor-pointer text-lg font-medium text-center break-words w-full"
+                >
+                    
+                </button>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top bar -->
+        <header class="bg-white shadow-md">
+            <div
+                class="max-w-7xl mx-auto py-4 px-6 flex justify-between items-center"
+            >
+                <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
+                <button
+                    id="sidebar-toggle"
+                    class="md:hidden text-gray-500 hover:text-gray-700"
+                >
+                    <svg
+                        class="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-700">
+            <div class="container mx-auto px-6 py-8">
+                <div
+                    class="flex justify-center items-center flex-col w-full min-h-screen bg-slate-700"
+                >
+                    <h1
+                        class="text-3xl font-bold text-white w-full flex justify-center flex-wrap"
+                    >
+                        Mis Codigos QR
+                    </h1>
+                    <!-- Lista infinita de contenedores -->
+                    <div id="qr-list" class="w-full mt-8">
+                        <!-- Ejemplo de un contenedor de QR -->
+                        <div
+                            class="qr-container flex items-center justify-between bg-white p-4 mb-4 rounded-lg shadow-md"
+                        >
+                            <img
+                                src="url_de_la_imagen_qr"
+                                alt="QR Code"
+                                class="w-16 h-16 object-cover"
+                            />
+                            <div class="flex-1 ml-4">
+                                <h2 class="text-lg font-semibold">
+                                    Nombre del QR
+                                </h2>
+                                <p class="text-gray-600">https://example.com</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button
+                                    class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                                >
+                                    Editar
+                                </button>
+                                <button
+                                    class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                                >
+                                    Eliminar
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Contenedores adicionales serán añadidos aquí dinámicamente -->
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
-</LayoutHome>
+</div>
 
 <script>
-    document.querySelector("#name-home").textContent = "stiven";
+    // Definir tipos para mayor seguridad
+    type QRCode = {
+        name: string;
+        url: string;
+        imageUrl: string;
+    };
+
+    // Función para crear un elemento QR
+    function createQRElement(qr: QRCode): HTMLDivElement {
+        const qrContainer = document.createElement("div");
+        qrContainer.classList.add(
+            "qr-container",
+            "flex",
+            "items-center",
+            "justify-between",
+            "bg-white",
+            "p-4",
+            "mb-4",
+            "rounded-lg",
+            "shadow-md",
+        );
+
+        qrContainer.innerHTML = `
+        <img src="${qr.imageUrl}" alt="QR Code" class="w-16 h-16 object-cover">
+        <div class="flex-1 ml-4">
+            <h2 class="text-lg font-semibold">${qr.name}</h2>
+            <p class="text-gray-600">${qr.url}</p>
+        </div>
+        <div class="flex space-x-2">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700">Editar</button>
+            <button class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700">Eliminar</button>
+        </div>
+    `;
+        return qrContainer;
+    }
+
+    // Función para cargar más QRs
+    function loadMoreQRs(): void {
+        const container = document.getElementById("qr-list");
+        if (!container) return;
+
+        for (let i = 0; i < 5; i++) {
+            const qr: QRCode = {
+                name: `Nombre del QR ${i + 1}`,
+                url: `https://example.com/${i + 1}`,
+                imageUrl: `url_de_la_imagen_qr_${i + 1}`,
+            };
+            const qrElement = createQRElement(qr);
+            container.appendChild(qrElement);
+        }
+    }
+
+    // Función para manejar el scroll infinito
+    function handleInfiniteScroll(): void {
+        if (
+            window.innerHeight + window.scrollY >=
+            document.body.offsetHeight - 100
+        ) {
+            loadMoreQRs();
+        }
+    }
+
+    // Función para manejar el toggle del sidebar
+    function handleSidebarToggle(): void {
+        const sidebar = document.getElementById("sidebar");
+        sidebar?.classList.toggle("w-0");
+        sidebar?.classList.toggle("w-80");
+    }
+
+    // Función para manejar el cierre de sesión
+    function handleLogout(): void {
+        alert("Cerrando sesión...");
+        // Aquí irían las acciones reales de cierre de sesión
+    }
+
+    // Inicialización y configuración de event listeners
+    function init(): void {
+        window.addEventListener("scroll", handleInfiniteScroll);
+
+        const sidebarToggle = document.getElementById("sidebar-toggle");
+        sidebarToggle?.addEventListener("click", handleSidebarToggle);
+
+        const closeSec = document.getElementById("close_sec");
+        closeSec?.addEventListener("click", handleLogout);
+
+        // Carga inicial de QRs
+        loadMoreQRs();
+    }
+
+    // Ejecutar la inicialización cuando el DOM esté listo
+    document.addEventListener("DOMContentLoaded", init);
 </script>

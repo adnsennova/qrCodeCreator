@@ -4,10 +4,40 @@ const bcrypt = require('bcrypt');
 const QRCode = require('qrcode');
 const pool = require('../db/db.js');
 const { log } = require('console');
+const { URL } = require('url');
+const https = require('https');
+const http = require('http');
+
 
 // Ejemplo de base de datos en memoria para usuarios y QR
 const users = [];
 const qrs = [];
+
+// Función para validar la URL
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
+// Función para verificar si la URL existe
+function urlExists(url) {
+    return new Promise((resolve) => {
+        const protocol = url.startsWith('https') ? https : http;
+        protocol.get(url, (res) => {
+            if (res.statusCode === 200) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        }).on('error', () => {
+            resolve(false);
+        });
+    });
+}
 
 // Función para crear un usuario
 exports.crear_usuario = async (req, res) => {
@@ -68,64 +98,58 @@ exports.validar_usuario = async (req, res) => {
     }
 };
 
-// Función para crear un QR
+
 exports.crear_qr = async (req, res) => {
     console.log('Iniciando crear_qr');
-    const { id_usuario, url, nombre_qr, color = '#000000', tamano = 300 } = req.body;
-    console.log('Datos recibidos:', { id_usuario, url, nombre_qr, color, tamano });
+    const { id_usuario, url, nombre_qr, color = '#000000' } = req.body;
+    console.log('Datos recibidos:', { id_usuario, url, nombre_qr, color });
 
     try {
-        let qrPath;
-        console.log('Buscando usuario');
-        const [row] = await pool.execute(
-            'SELECT id FROM users WHERE id = ?',
-            [id_usuario]
-        );
-        if (row.length === 0) {
-            return res.status(404).json({ message: 'usuario no encontrado' })
-        }
-        console.log(`id recibido de consulta: ${row[0].id} || id del cuerpo: ${id_usuario}`);
+        // Iniciamos una transacción
+        const connection = await pool.getConnection();
+        await connection.beginTransaction();
 
-        if (row[0].id) {
+        try {
+            console.log('Verificando usuario');
+            const [userRows] = await connection.execute(
+                'SELECT id FROM users WHERE id = ?',
+                [id_usuario]
+            );
 
-            console.log('Creando carpeta del usuario');
-            const userFolder = `./public/user_folder_${id_usuario}`;
-
-            if (!fs.existsSync(userFolder)) {
-                fs.mkdirSync(userFolder);
-                console.log('Carpeta creada:', userFolder);
-            } else {
-                console.log('La carpeta ya existe');
+            if (userRows.length === 0) {
+                await connection.rollback();
+                connection.release();
+                console.log('Usuario no encontrado');
+                return res.status(404).json({ message: 'Usuario no encontrado' });
             }
 
-            qrPath = path.join(userFolder, `${nombre_qr}.png`);
-            console.log('Ruta del QR:', qrPath);
+            console.log('Usuario verificado, insertando QR en la base de datos');
+            const [result] = await connection.execute(
+                'INSERT INTO qrs (nombre, url, color, id_usuario) VALUES (?, ?, ?, ?)',
+                [nombre_qr, url, color, id_usuario]
+            );
 
-            // Validar si el archivo ya existe
-            if (fs.existsSync(qrPath)) {
-                console.log('Error: El archivo ya existe');
-                return res.status(400).json({ message: 'Ya existe un QR con ese nombre. Por favor, elige otro nombre.' });
-            }
-   
-            console.log('Generando código QR');
-            await QRCode.toFile(qrPath, url, {
-                color: {
-                    dark: color,
-                    light: '#FFFFFF'
-                },
-                width: tamano
+            await connection.commit();
+            connection.release();
+
+            console.log('QR insertado en la base de datos');
+            res.status(201).json({ 
+                message: 'QR creado y almacenado en la base de datos',
+                qr: { nombre: nombre_qr, url, color, id_usuario },
+                id: result.insertId
             });
-
-            console.log('Código QR generado');
-
-            qrs.push({ id_usuario, nombre_qr, path: qrPath });
-            console.log('QR guardado en memoria');
+        } catch (error) {
+            await connection.rollback();
+            connection.release();
+            throw error;
         }
-
-        res.status(201).json({ message: 'QR creado', qrPath });
     } catch (error) {
         console.error('Error en crear_qr:', error);
-        res.status(500).json({ message: 'Error al crear QR', error: error.message });
+        if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+            res.status(400).json({ message: 'El usuario especificado no existe' });
+        } else {
+            res.status(500).json({ message: 'Error al crear QR', error: error.message });
+        }
     }
 };
 // Función para traer QR de un usuario
