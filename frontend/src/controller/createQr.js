@@ -35,7 +35,7 @@ document.getElementById('qrForm').addEventListener('submit', async function (eve
         if (response.ok) {
             // Mostrar el QR generado
             const qrContainer = document.createElement('div');
-            qrContainer.innerHTML = `<img src="${result.qrPath}" alt="QR Code" class="mx-auto my-4">`;
+            // qrContainer.innerHTML = `<img src="${result.qrPath}" alt="QR Code" class="mx-auto my-4">`;
             resultMessage.parentNode.insertBefore(qrContainer, resultMessage.nextSibling);
 
             resultMessage.classList.remove('hidden', 'text-red-500');

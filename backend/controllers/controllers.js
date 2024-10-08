@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
-const QRCode = require('qrcode');
+// const QRCode = require('qrcode');
 const pool = require('../db/db.js');
 const { log } = require('console');
 const { URL } = require('url');
@@ -113,67 +113,39 @@ exports.crear_qr = async (req, res) => {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        // Crear nombre único para la carpeta del usuario
-        const userQrDirectory = path.join(__dirname, '..', 'public', `qrs/qrs_user_${id_usuario}`);
-        
-        // Verificar si la carpeta del usuario ya existe, si no, crearla
-        if (!fs.existsSync(userQrDirectory)) {
-            fs.mkdirSync(userQrDirectory, { recursive: true });
-        }
+        // Verificar si ya existe un QR con el mismo nombre para este usuario
+        const [qrRows] = await pool.execute(
+            'SELECT * FROM qrs WHERE nombre = ? AND id_usuario = ?',
+            [nombre_qr, id_usuario]
+        );
 
-        // Generar nombre único para el archivo (qr_iduser_fechadecreacion.png)
-        const fileName = `qr_${id_usuario}_${Date.now()}.png`;
-        const filePath = path.join(userQrDirectory, fileName);
-
-        // Verificar si ya existe un archivo QR con el mismo nombre
-        const existingFiles = fs.readdirSync(userQrDirectory);
-        const qrExists = existingFiles.some(file => file.includes(nombre_qr));
-        if (qrExists) {
+        if (qrRows.length > 0) {
             return res.status(400).json({ message: `Ya existe un QR con el nombre "${nombre_qr}" para este usuario.` });
         }
 
-        // Generar el código QR
-        const qrOptions = {
-            color: {
-                dark: color,
-                light: '#ffffff'
-            }
-        };
+        // Insertar la información del QR en la base de datos
+        const [result] = await pool.execute(
+            'INSERT INTO qrs (nombre, url, color, id_usuario) VALUES (?, ?, ?, ?)',
+            [nombre_qr, url, color, id_usuario]
+        );
 
-        QRCode.toFile(filePath, url, qrOptions)
-            .then(async () => {
-                // Insertar el nuevo QR en la base de datos (sin qr_path)
-                const [result] = await pool.execute(
-                    'INSERT INTO qrs (nombre, url, color, id_usuario) VALUES (?, ?, ?, ?)',
-                    [nombre_qr, url, color, id_usuario]
-                );
-
-                // Respuesta exitosa
-                res.status(201).json({
-                    message: 'QR creado y almacenado en la base de datos',
-                    qr: { 
-                        nombre: nombre_qr, 
-                        url, 
-                        color, 
-                        id_usuario 
-                    },
-                    id: result.insertId,
-                });
-            })
-            .catch(error => {
-                console.error('Error en crear_qr:', error);
-                res.status(500).json({ message: 'Error al crear QR', error });
-            });
+        // Respuesta exitosa
+        res.status(201).json({
+            message: 'QR creado y almacenado en la base de datos',
+            qr: { 
+                nombre: nombre_qr, 
+                url, 
+                color, 
+                id_usuario 
+            },
+            id: result.insertId,
+        });
 
     } catch (error) {
         console.error('Error en crear_qr:', error);
-        if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-            return res.status(400).json({ message: 'El usuario especificado no existe o la relación de clave foránea es inválida' });
-        }
         res.status(500).json({ message: 'Error al crear QR', error });
     }
 };
-
 
 
 // Función para traer QR de un usuario
@@ -199,3 +171,30 @@ exports.traer_qr = async (req, res) => {
         res.status(500).json({ message: 'Error al traer QR', error });
     }
 };
+
+exports.obtener_qrs = async (req, res) => {
+    const { id_usuario } = req.params;  // Suponemos que el id_usuario viene en los parámetros de la URL
+
+    try {
+        // Consultar todos los QRs del usuario especificado
+        const [qrRows] = await pool.execute(
+            'SELECT * FROM qrs WHERE id_usuario = ?',
+            [id_usuario]
+        );
+
+        if (qrRows.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron QRs para este usuario.' });
+        }
+
+        // Respuesta exitosa con los registros encontrados
+        res.status(200).json({
+            message: 'QRs obtenidos exitosamente',
+            qrs: qrRows
+        });
+
+    } catch (error) {
+        console.error('Error al obtener QRs:', error);
+        res.status(500).json({ message: 'Error al obtener QRs', error });
+    }
+};
+
