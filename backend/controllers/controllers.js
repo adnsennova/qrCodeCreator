@@ -98,7 +98,6 @@ exports.validar_usuario = async (req, res) => {
     }
 };
 
-
 exports.crear_qr = async (req, res) => {
     const { id_usuario, url, nombre_qr, color = '#000000' } = req.body;
     console.log(id_usuario, url, nombre_qr, color);
@@ -114,6 +113,25 @@ exports.crear_qr = async (req, res) => {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
+        // Crear nombre único para la carpeta del usuario
+        const userQrDirectory = path.join(__dirname, '..', 'public', `qrs/qrs_user_${id_usuario}`);
+        
+        // Verificar si la carpeta del usuario ya existe, si no, crearla
+        if (!fs.existsSync(userQrDirectory)) {
+            fs.mkdirSync(userQrDirectory, { recursive: true });
+        }
+
+        // Generar nombre único para el archivo (qr_iduser_fechadecreacion.png)
+        const fileName = `qr_${id_usuario}_${Date.now()}.png`;
+        const filePath = path.join(userQrDirectory, fileName);
+
+        // Verificar si ya existe un archivo QR con el mismo nombre
+        const existingFiles = fs.readdirSync(userQrDirectory);
+        const qrExists = existingFiles.some(file => file.includes(nombre_qr));
+        if (qrExists) {
+            return res.status(400).json({ message: `Ya existe un QR con el nombre "${nombre_qr}" para este usuario.` });
+        }
+
         // Generar el código QR
         const qrOptions = {
             color: {
@@ -122,35 +140,30 @@ exports.crear_qr = async (req, res) => {
             }
         };
 
-        // Crear directorio para QRs si no existe
-        const qrDirectory = path.join(__dirname, '..', 'public', 'qrs');
-        await fs.mkdir(qrDirectory, { recursive: true });
+        QRCode.toFile(filePath, url, qrOptions)
+            .then(async () => {
+                // Insertar el nuevo QR en la base de datos (sin qr_path)
+                const [result] = await pool.execute(
+                    'INSERT INTO qrs (nombre, url, color, id_usuario) VALUES (?, ?, ?, ?)',
+                    [nombre_qr, url, color, id_usuario]
+                );
 
-        // Generar nombre único para el archivo
-        const fileName = `${Date.now()}-${nombre_qr}.png`;
-        const filePath = path.join(qrDirectory, fileName);
-        
-        // Generar el QR
-        await QRCode.toFile(filePath, url, qrOptions);
-
-        // Insertar el nuevo QR en la base de datos
-        const [result] = await pool.execute(
-            'INSERT INTO qrs (nombre, url, color, id_usuario, qr_path) VALUES (?, ?, ?, ?, ?)',
-            [nombre_qr, url, color, id_usuario, `/qrs/${fileName}`]
-        );
-
-        // Respuesta exitosa
-        res.status(201).json({
-            message: 'QR creado y almacenado en la base de datos',
-            qr: { 
-                nombre: nombre_qr, 
-                url, 
-                color, 
-                id_usuario 
-            },
-            id: result.insertId,
-            qrPath: `/qrs/${fileName}`
-        });
+                // Respuesta exitosa
+                res.status(201).json({
+                    message: 'QR creado y almacenado en la base de datos',
+                    qr: { 
+                        nombre: nombre_qr, 
+                        url, 
+                        color, 
+                        id_usuario 
+                    },
+                    id: result.insertId,
+                });
+            })
+            .catch(error => {
+                console.error('Error en crear_qr:', error);
+                res.status(500).json({ message: 'Error al crear QR', error });
+            });
 
     } catch (error) {
         console.error('Error en crear_qr:', error);
@@ -160,6 +173,7 @@ exports.crear_qr = async (req, res) => {
         res.status(500).json({ message: 'Error al crear QR', error });
     }
 };
+
 
 
 // Función para traer QR de un usuario

@@ -1,5 +1,4 @@
 import config from "../config/config.json";
-
 document.getElementById('qrForm').addEventListener('submit', async function (event) {
     event.preventDefault();
     const formData = new FormData(event.target);
