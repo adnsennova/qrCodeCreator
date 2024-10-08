@@ -100,58 +100,68 @@ exports.validar_usuario = async (req, res) => {
 
 
 exports.crear_qr = async (req, res) => {
-    console.log('Iniciando crear_qr');
     const { id_usuario, url, nombre_qr, color = '#000000' } = req.body;
-    console.log('Datos recibidos:', { id_usuario, url, nombre_qr, color });
-
+    console.log(id_usuario, url, nombre_qr, color);
+    
     try {
-        // Iniciamos una transacción
-        const connection = await pool.getConnection();
-        await connection.beginTransaction();
+        // Verificar si el usuario existe
+        const [userRows] = await pool.execute(
+            'SELECT id FROM users WHERE id = ?',
+            [id_usuario]
+        );
 
-        try {
-            console.log('Verificando usuario');
-            const [userRows] = await connection.execute(
-                'SELECT id FROM users WHERE id = ?',
-                [id_usuario]
-            );
-
-            if (userRows.length === 0) {
-                await connection.rollback();
-                connection.release();
-                console.log('Usuario no encontrado');
-                return res.status(404).json({ message: 'Usuario no encontrado' });
-            }
-
-            console.log('Usuario verificado, insertando QR en la base de datos');
-            const [result] = await connection.execute(
-                'INSERT INTO qrs (nombre, url, color, id_usuario) VALUES (?, ?, ?, ?)',
-                [nombre_qr, url, color, id_usuario]
-            );
-
-            await connection.commit();
-            connection.release();
-
-            console.log('QR insertado en la base de datos');
-            res.status(201).json({ 
-                message: 'QR creado y almacenado en la base de datos',
-                qr: { nombre: nombre_qr, url, color, id_usuario },
-                id: result.insertId
-            });
-        } catch (error) {
-            await connection.rollback();
-            connection.release();
-            throw error;
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
         }
+
+        // Generar el código QR
+        const qrOptions = {
+            color: {
+                dark: color,
+                light: '#ffffff'
+            }
+        };
+
+        // Crear directorio para QRs si no existe
+        const qrDirectory = path.join(__dirname, '..', 'public', 'qrs');
+        await fs.mkdir(qrDirectory, { recursive: true });
+
+        // Generar nombre único para el archivo
+        const fileName = `${Date.now()}-${nombre_qr}.png`;
+        const filePath = path.join(qrDirectory, fileName);
+        
+        // Generar el QR
+        await QRCode.toFile(filePath, url, qrOptions);
+
+        // Insertar el nuevo QR en la base de datos
+        const [result] = await pool.execute(
+            'INSERT INTO qrs (nombre, url, color, id_usuario, qr_path) VALUES (?, ?, ?, ?, ?)',
+            [nombre_qr, url, color, id_usuario, `/qrs/${fileName}`]
+        );
+
+        // Respuesta exitosa
+        res.status(201).json({
+            message: 'QR creado y almacenado en la base de datos',
+            qr: { 
+                nombre: nombre_qr, 
+                url, 
+                color, 
+                id_usuario 
+            },
+            id: result.insertId,
+            qrPath: `/qrs/${fileName}`
+        });
+
     } catch (error) {
         console.error('Error en crear_qr:', error);
         if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-            res.status(400).json({ message: 'El usuario especificado no existe' });
-        } else {
-            res.status(500).json({ message: 'Error al crear QR', error: error.message });
+            return res.status(400).json({ message: 'El usuario especificado no existe o la relación de clave foránea es inválida' });
         }
+        res.status(500).json({ message: 'Error al crear QR', error });
     }
 };
+
+
 // Función para traer QR de un usuario
 exports.traer_qr = async (req, res) => {
     const { id_usuario } = req.query;

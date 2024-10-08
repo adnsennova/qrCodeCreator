@@ -13,7 +13,6 @@ document.getElementById('qrForm').addEventListener('submit', async function (eve
     let id = getCookie("userId");
     console.log(`valor del id: ${id}`);
 
-
     const data = {
         id_usuario: id,
         url: formData.get('url'),
@@ -35,12 +34,17 @@ document.getElementById('qrForm').addEventListener('submit', async function (eve
 
         const resultMessage = document.getElementById('resultMessage');
         if (response.ok) {
+            // Mostrar el QR generado
+            const qrContainer = document.createElement('div');
+            qrContainer.innerHTML = `<img src="${result.qrPath}" alt="QR Code" class="mx-auto my-4">`;
+            resultMessage.parentNode.insertBefore(qrContainer, resultMessage.nextSibling);
+
             resultMessage.classList.remove('hidden', 'text-red-500');
             resultMessage.classList.add('text-green-500');
-            resultMessage.innerText = `QR generado exitosamente: ${result.qrPath}`;
+            resultMessage.innerText = 'QR generado exitosamente';
 
             Toastify({
-                text: `QR generado exitosamente: ${result.qrPath}`,
+                text: 'QR generado exitosamente',
                 style: {
                     background: "green"
                 },
@@ -50,8 +54,8 @@ document.getElementById('qrForm').addEventListener('submit', async function (eve
                 },
             }).showToast();
 
-            setInterval(() => {
-                // location.href = "/Home";
+            setTimeout(() => {
+                location.href = "/Home";
             }, 2000);
         } else {
             throw new Error(result.message || 'Error desconocido');

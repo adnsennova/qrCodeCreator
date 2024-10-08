@@ -5,6 +5,8 @@ const routes = require('./routes/routes');
 
 const app = express();
 
+// Configurar el middleware para servir archivos estáticos desde la carpeta 'public'
+app.use(express.static('public'));
 // Configurar CORS para permitir cookies
 app.use(cors({
   origin: '*', // Reemplaza con la URL de tu frontend
