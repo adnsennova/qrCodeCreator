@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
 
-    async function load_qrs  () {
+    async function load_qrs() {
         try {
             const response = await fetch(`http://localhost:3000/api/qrs/${id}`);
             const result = await response.json();
@@ -107,6 +107,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                         const qrId = qr.id; // Obtén el ID directamente del objeto qr
                         deleteQR(qrId);
                     });
+
+                    // Agregar escuchador para el botón de descarga
+                    const downloadButton = qrCard.querySelector('.download-btn');
+                    downloadButton.addEventListener('click', () => {
+                        downloadQRCode(qrElement);
+                    });
                 });
 
                 showToast('QRs cargados exitosamente', 'success');
@@ -118,7 +124,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             showToast(`Error al cargar los QRs: ${error.message}`, 'error');
         }
     }
-    load_qrs()
+
+    load_qrs();
 });
 
 // Función para eliminar el QR
@@ -135,9 +142,9 @@ async function deleteQR(id) {
             showToast(result.message, 'success');
             // Aquí puedes eliminar el elemento del DOM si es necesario
             setInterval(() => {
-                location.reload()
+                location.reload();
             }, 2000);
-            document.getElementById(`qr_${id}`).remove(); // Asegúrate de eliminar el contenedor correcto
+            // document.getElementById(`qr_${id}`).remove(); // Asegúrate de eliminar el contenedor correcto
         } else {
             showToast(result.message || 'Error al eliminar el QR', 'error');
         }
@@ -145,12 +152,6 @@ async function deleteQR(id) {
         console.error('Error al eliminar el QR:', error);
         showToast('Error al eliminar el QR', 'error');
     }
-}
-
-// Mueve las funciones `editQR` y `deleteQR` fuera del DOMContentLoaded
-function editQR(id) {
-    console.log('Editar QR:', id);
-    // Implementar lógica de edición
 }
 
 // Función para descargar el QR
@@ -184,4 +185,10 @@ function downloadQRCode(qrElement) {
     } else {
         console.error('No se encontró la imagen del QR para descargar.');
     }
+}
+
+// Mueve las funciones `editQR` y `deleteQR` fuera del DOMContentLoaded
+function editQR(id) {
+    console.log('Editar QR:', id);
+    // Implementar lógica de edición
 }
