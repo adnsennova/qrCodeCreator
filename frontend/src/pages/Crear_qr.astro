@@ -2,11 +2,14 @@
 import LayoutHome from "../layouts/Layout_home.astro";
 import Navbar from "../components/Navbar.astro";
 import FormCreateQr from "../components/FormCreateQr.astro";
+import Footer from "../components/Footer.astro";
 ---
+<script src="../controller/validate_session.js"></script>
 <script src="../controller/createQr.js"></script>
 <LayoutHome title="Home - Crear Qr">
     <Navbar />
     <div class="w-full h-[100vh] flex justify-center items-center"> 
         <FormCreateQr />
     </div>
+    <Footer/>
 </LayoutHome>

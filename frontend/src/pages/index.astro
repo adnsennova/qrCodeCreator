@@ -1,15 +1,68 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
-import FormRegister from "../components/FormRegister.astro";
+import img from "../../public/img/bg.webp"
+import { Image } from "astro:assets";
+import Footer from "../components/Footer.astro";
 ---
 
 <Layout title="QR CODE CREATOR">
     <Navbar />
-    <div class="flex justify-center items-center flex-col">
-        <h1 class="text-3xl font-bold text-white w-full flex justify-center">
-            Hello world! 🍾
-        </h1>
-        <!-- <FormRegister /> -->
-    </div>
+    <main class="min-h-screen">
+        <!-- Hero Section -->
+        <section class="min-h-screen flex justify-center items-center flex-col bg-gradient-to-b from-indigo-600 to-purple-800 text-white px-4">
+            <h1 class="text-4xl font-bold text-center mb-6">Genera Códigos QR para tus URLs en segundos</h1>
+            <p class="text-xl text-center max-w-lg mb-10">Con nuestra aplicación, puedes generar códigos QR que redirigen a cualquier sitio web de manera rápida y sencilla, sin anuncios que interrumpan tu experiencia.</p>
+            <Image src={img} alt="Ejemplo de QR" class="mb-6 rounded-lg shadow-lg w-full lg:max-w-[20vw]">
+            <a href="#features" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-full transition-colors">Descubre más</a>
+        </section>
+
+        <section id="features" class="min-h-screen py-16 bg-slate-900 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center mb-12">¿Por qué usar nuestra aplicación?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-slate-800 p-6 rounded-lg shadow-lg text-center hover:bg-slate-700 transition-colors">
+                        <i data-feather="x-circle" class="w-12 h-12 mx-auto mb-4 text-blue-500"></i>
+                        <h3 class="text-2xl font-semibold mb-4">Sin anuncios</h3>
+                        <p class="text-lg">Nos enfocamos en ofrecer una experiencia libre de distracciones. No verás anuncios, lo que hace que generar tus códigos QR sea rápido y sin interrupciones.</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-lg shadow-lg text-center hover:bg-slate-700 transition-colors">
+                        <i data-feather="mouse-pointer" class="w-12 h-12 mx-auto mb-4 text-blue-500"></i>
+                        <h3 class="text-2xl font-semibold mb-4">Fácil de usar</h3>
+                        <p class="text-lg">Nuestra interfaz es intuitiva. Solo necesitas ingresar la URL y en cuestión de segundos tendrás tu código QR listo para ser utilizado.</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-lg shadow-lg text-center hover:bg-slate-700 transition-colors">
+                        <i data-feather="check-circle" class="w-12 h-12 mx-auto mb-4 text-blue-500"></i>
+                        <h3 class="text-2xl font-semibold mb-4">Código QR de alta calidad</h3>
+                        <p class="text-lg">Los códigos QR generados son de alta resolución, lo que asegura que sean fácilmente escaneables en cualquier dispositivo.</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-lg shadow-lg text-center hover:bg-slate-700 transition-colors">
+                        <i data-feather="download" class="w-12 h-12 mx-auto mb-4 text-blue-500"></i>
+                        <h3 class="text-2xl font-semibold mb-4">Descarga instantánea</h3>
+                        <p class="text-lg">Descarga tus códigos QR en múltiples formatos (PNG, SVG, PDF) con un solo clic. Perfectos para uso digital o impresión.</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-lg shadow-lg text-center hover:bg-slate-700 transition-colors">
+                        <i data-feather="shield" class="w-12 h-12 mx-auto mb-4 text-blue-500"></i>
+                        <h3 class="text-2xl font-semibold mb-4">Seguridad garantizada</h3>
+                        <p class="text-lg">Tus datos están seguros con nosotros. No almacenamos información sensible y utilizamos conexiones seguras para todas las operaciones.</p>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-lg shadow-lg text-center hover:bg-slate-700 transition-colors">
+                        <i data-feather="settings" class="w-12 h-12 mx-auto mb-4 text-blue-500"></i>
+                        <h3 class="text-2xl font-semibold mb-4">Personalización avanzada</h3>
+                        <p class="text-lg">Personaliza tus códigos QR con colores, logos y estilos únicos. Crea códigos QR que reflejen tu marca personal o empresarial.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-800 to-indigo-600 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-16">
+                <h2 class="text-3xl font-bold mb-6">Empieza a generar tus códigos QR ahora</h2>
+                <p class="text-xl mb-8">Sin registros innecesarios, sin anuncios. Empieza hoy mismo a simplificar el acceso a tus URLs.</p>
+                <a href="/Crear_qr" class="bg-white hover:bg-gray-200 text-indigo-600 font-bold py-3 px-6 rounded-full transition-colors">Generar QR</a>
+            </div>
+        </section>
+    </main>
+    <Footer/>
 </Layout>

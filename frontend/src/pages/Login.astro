@@ -2,15 +2,23 @@
 import Layout from "../layouts/Layout_validate_user.astro";
 import Navbar from "../components/Navbar.astro";
 import FormLogin from "../components/FormLogin.astro";
-
+import Footer from "../components/Footer.astro";
 ---
 
 <Layout title="QR CODE CREATOR - login">
-    <Navbar />
-    <div class="flex justify-center items-center flex-col">
+    <div class="min-h-screen flex flex-col">
+      <Navbar />
+      
+      <!-- Contenedor principal que crecerá para llenar el espacio disponible -->
+      <div class="flex-grow flex justify-center items-center flex-col">
         <h1 class="text-3xl font-bold text-white w-full flex justify-center">
-            Hello world! 🍾
+          Hello world! 🍾
         </h1>
         <FormLogin />
+      </div>
+  
+      <!-- Footer pegado al final -->
+      <Footer />
     </div>
-</Layout>
+  </Layout>
+  
