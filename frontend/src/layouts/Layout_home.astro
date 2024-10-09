@@ -17,10 +17,8 @@ const { title } = Astro.props;
 		<title>{title}</title>
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-		<!-- <script src="../controller/createQr.js"></script> -->
-		 
-		<script src="../controller/home.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+		<script type="module" src="/js/home.js"></script>
 		<script src="https://cdn.lordicon.com/lordicon.js"></script>
 	</head>
 	<body>

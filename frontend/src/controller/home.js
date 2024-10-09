@@ -3,6 +3,8 @@
 // <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 // <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
+import QRCode from 'qrcode';
+
 document.addEventListener("DOMContentLoaded", async function () {
     function getCookie(name) {
         const value = `; ${document.cookie}`;
@@ -20,7 +22,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     try {
         const response = await fetch(`http://localhost:3000/api/qrs/${id}`);
         const result = await response.json();
-
+        console.log(result.qrs);
+        
         if (response.ok) {
             const qrContainer = document.getElementById('qr-container');
             

@@ -198,3 +198,29 @@ exports.obtener_qrs = async (req, res) => {
     }
 };
 
+exports.eliminar_qr = async (req, res) => {
+    const { id } = req.params;  // Suponemos que el ID del QR viene en los parámetros de la URL
+    console.log(`id recibido en backend: ${id}`);
+    
+    try {
+        // Ejecutar la consulta para eliminar el QR
+        const [result] = await pool.execute(
+            'DELETE FROM qrs WHERE id = ?',
+            [id]
+        );
+
+        // Verificar si se eliminó alguna fila
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'No se encontró el QR con el ID especificado.' });
+        }
+
+        // Respuesta exitosa
+        res.status(200).json({
+            message: 'QR eliminado exitosamente'
+        });
+
+    } catch (error) {
+        console.error('Error al eliminar el QR:', error);
+        res.status(500).json({ message: 'Error al eliminar el QR', error });
+    }
+};
