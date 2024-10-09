@@ -1,15 +1,104 @@
 ---
-import LayoutHome from "../layouts/Layout_home.astro";
+import Layout_createQr from "../layouts/Layout_createQr.astro";
 import Navbar from "../components/Navbar.astro";
 import FormCreateQr from "../components/FormCreateQr.astro";
 import Footer from "../components/Footer.astro";
+import Image from "astro/components/Image.astro";
+const userName = ["Alice", "Bob", "Charlie", "David", "Eve"][
+    Math.floor(Math.random() * 5)
+];
 ---
+
 <script src="../controller/validate_session.js"></script>
 <script src="../controller/createQr.js"></script>
-<LayoutHome title="Home - Crear Qr">
+<Layout_createQr title="Home - Crear Qr">
     <Navbar />
-    <div class="w-full h-[100vh] flex justify-center items-center"> 
-        <FormCreateQr />
+
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <aside
+            id="sidebar"
+            class="w-0 md:w-80 bg-slate-800 shadow-md p-6 transition-all duration-300 overflow-hidden"
+        >
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-white">User Info</h2>
+            </div>
+            <nav class="space-y-6">
+                <div class="flex flex-col items-center">
+                    <Image
+                        src={`https://picsum.photos/128?random=${Math.random()}`}
+                        alt="Profile"
+                        width={128}
+                        height={128}
+                        class="rounded-full w-32 h-32 mb-4 object-cover"
+                    />
+                    <p
+                        class="text-white text-lg font-medium text-center break-words w-full"
+                        id="name_profile"
+                    >
+                        {userName}
+                    </p>
+                    <button
+                        id="close_sec"
+                        class="text-red-600 hover:text-red-800 cursor-pointer text-lg font-medium text-center break-words w-full"
+                    >
+                        Close
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top bar -->
+            <header class="bg-white shadow-md">
+                <div
+                    class="max-w-7xl mx-auto py-4 px-6 flex justify-between items-center"
+                >
+                    <h1 class="text-2xl font-semibold text-gray-900">
+                        Dashboard
+                    </h1>
+                    <button
+                        id="sidebar-toggle"
+                        class="md:hidden text-gray-500 hover:text-gray-700"
+                    >
+                        <svg
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main content -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-700">
+                <div class="container mx-auto px-6 py-8 h-full">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-white">
+                            Crear codigo Qr
+                        </h2>
+                    </div>
+
+                    <!-- Contenedor de QRs con centrado -->
+                    <div class="flex items-center justify-center h-[calc(100%-4rem)]">
+                        <div
+                            id="qr-container"
+                            class="w-full max-w-2xl"
+                        >
+                            <FormCreateQr />
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
-    <Footer/>
-</LayoutHome>
+    <Footer />
+</Layout_createQr>
