@@ -196,7 +196,7 @@ function downloadQRCode(qrElement, nombre, tamano) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${nombre}.png`; // Nombre del archivo
+            a.download = `dev_stivenColoradoQrCreator_${nombre}.png`; // Nombre del archivo
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
