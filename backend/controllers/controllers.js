@@ -123,8 +123,14 @@ exports.validar_usuario = async (req, res) => {
 };
 
 exports.crear_qr = async (req, res) => {
-    const { id_usuario, url, nombre_qr, color = '#000000' } = req.body;
-    console.log(id_usuario, url, nombre_qr, color);
+    const { 
+        id_usuario, 
+        url, 
+        nombre_qr, 
+        color = '#000000',
+        tamano = 500  // Valor predeterminado de 256 píxeles
+    } = req.body;
+    console.log(id_usuario, url, nombre_qr, color, tamano);
 
     try {
         // Verificar si el usuario existe
@@ -149,8 +155,8 @@ exports.crear_qr = async (req, res) => {
 
         // Insertar la información del QR en la base de datos
         const [result] = await pool.execute(
-            'INSERT INTO qrs (nombre, url, color, id_usuario) VALUES (?, ?, ?, ?)',
-            [nombre_qr, url, color, id_usuario]
+            'INSERT INTO qrs (nombre, url, color, tamano, id_usuario) VALUES (?, ?, ?, ?, ?)',
+            [nombre_qr, url, color, tamano, id_usuario]
         );
 
         // Respuesta exitosa
@@ -160,6 +166,7 @@ exports.crear_qr = async (req, res) => {
                 nombre: nombre_qr,
                 url,
                 color,
+                tamano,
                 id_usuario
             },
             id: result.insertId,
@@ -170,7 +177,6 @@ exports.crear_qr = async (req, res) => {
         res.status(500).json({ message: 'Error al crear QR', error });
     }
 };
-
 
 // Función para traer QR de un usuario
 exports.traer_qr = async (req, res) => {

@@ -14,6 +14,7 @@ function showToast(message, type = 'success') {
     }).showToast();
 }
 
+let currentQRData = null;
 document.addEventListener("DOMContentLoaded", async function () {
     function getCookie(name) {
         const value = `; ${document.cookie}`;
@@ -35,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             if (response.ok) {
                 const qrContainer = document.getElementById('qr-container');
+                console.log(result);
 
                 if (result.qrs.length === 0) {
                     qrContainer.innerHTML = `
@@ -59,34 +61,43 @@ document.addEventListener("DOMContentLoaded", async function () {
                     );
 
                     qrCard.innerHTML = `
-                        <div class="p-6">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h3 class="text-xl font-semibold text-gray-800">${qr.nombre}</h3>
-                                    <a href="${qr.url}" target="_blank" 
-                                       class="text-sm text-blue-600 hover:text-blue-800 break-all">
-                                        ${qr.url}
-                                    </a>
-                                </div>
-                                <div class="w-6 h-6 rounded-full" 
-                                     style="background-color: ${qr.color}">
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-center my-4" id="qr_${qr.id}"></div>
-                            
-                            <div class="flex justify-end space-x-2 mt-4">
-                                <button class="edit-btn px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors" data-id="${qr.id}">
-                                    Editar
-                                </button>
-                                <button class="delete-btn px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors" data-id="${qr.id}">
-                                    Eliminar
-                                </button>
-                                <button class="download-btn bg-green-200 px-4 py-2 rounded hover:bg-green-600 transition-colors" data-id="${qr.id}">
-                                    Descargar
-                                </button>
-                            </div>
-                        </div>
+                        <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:transform hover:scale-105">
+    <div class="p-6 h-[500px] flex flex-col"> <!-- Altura fija para todas las tarjetas -->
+        <!-- Encabezado con título y color -->
+        <div class="flex justify-between items-start mb-4">
+            <div class="flex-1 min-w-0 mr-4">
+                <h3 class="text-xl font-semibold text-gray-800 truncate">${qr.nombre}</h3>
+                <a href="${qr.url}" target="_blank" 
+                   class="text-sm text-blue-600 hover:text-blue-800 break-all">
+                    ${qr.url}
+                </a>
+            </div>
+            <div class="w-6 h-6 rounded-full flex-shrink-0" 
+                 style="background-color: ${qr.color}">
+            </div>
+        </div>
+        
+        <!-- Contenedor del QR con tamaño fijo y centrado -->
+        <div class="flex-grow flex items-center justify-center">
+            <div class="w-full min-w-[200px] max-w-[300px] aspect-square">
+                <div class="min-w-full min-h-full flex items-center justify-center bg-white" id="qr_${qr.id}"></div>
+            </div>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="flex justify-end space-x-2 mt-4">
+            <button class="edit-btn px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors" data-id="${qr.id}">
+                Editar
+            </button>
+            <button class="delete-btn px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors" data-id="${qr.id}">
+                Eliminar
+            </button>
+            <button class="download-btn px-4 py-2 bg-green-200 text-gray-800 rounded hover:bg-green-600 hover:text-white transition-colors" data-id="${qr.id}">
+                Descargar
+            </button>
+        </div>
+    </div>
+</div>    
                     `;
 
                     qrContainer.appendChild(qrCard);
@@ -95,8 +106,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const qrElement = document.getElementById(`qr_${qr.id}`);
                     new QRCode(qrElement, {
                         text: qr.url,
-                        width: 128,
-                        height: 128,
+                        width: qr.tamano,
+                        height: qr.tamano,
                         colorDark: qr.color,
                         colorLight: "#ffffff"
                     });
@@ -111,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     // Agregar escuchador para el botón de descarga
                     const downloadButton = qrCard.querySelector('.download-btn');
                     downloadButton.addEventListener('click', () => {
-                        downloadQRCode(qrElement);
+                        downloadQRCode(qrElement, qr.nombre, qr.tamano);
                     });
                 });
 
@@ -155,7 +166,9 @@ async function deleteQR(id) {
 }
 
 // Función para descargar el QR
-function downloadQRCode(qrElement) {
+function downloadQRCode(qrElement, nombre, tamano) {
+    console.log(qrElement);
+
     // Crea un canvas temporal
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -164,19 +177,26 @@ function downloadQRCode(qrElement) {
     const qrCodeImage = qrElement.querySelector('img');
 
     if (qrCodeImage) {
-        // Configura el tamaño del canvas
-        canvas.width = 128;
-        canvas.height = 128;
+        const qrSize = parseInt(tamano);
+        const padding = 20; // Margen alrededor del QR
 
-        // Dibuja la imagen en el canvas
-        ctx.drawImage(qrCodeImage, 0, 0, 128, 128);
+        // Ajusta el tamaño del canvas con el padding
+        canvas.width = qrSize + padding * 2;
+        canvas.height = qrSize + padding * 2;
+
+        // Centra el QR en el canvas
+        const xOffset = (canvas.width - qrSize) / 2;
+        const yOffset = (canvas.height - qrSize) / 2;
+
+        // Dibuja la imagen del QR centrada en el canvas
+        ctx.drawImage(qrCodeImage, xOffset, yOffset, qrSize, qrSize);
 
         // Convierte el canvas a un formato de imagen
         canvas.toBlob((blob) => {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'codigo_qr.png'; // Nombre del archivo
+            a.download = `${nombre}.png`; // Nombre del archivo
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -187,15 +207,109 @@ function downloadQRCode(qrElement) {
     }
 }
 
-// Mueve las funciones `editQR` y `deleteQR` fuera del DOMContentLoaded
-function editQR(id) {
-    console.log('Editar QR:', id);
-    // Implementar lógica de edición
+
+// Función para abrir el modal
+function openEditModal(qrId) {
+    const modal = document.getElementById('editModal');
+    const form = document.getElementById('editQRForm');
+    
+    // Obtener los datos actuales del QR
+    fetch(`http://localhost:3000/api/qrs/${qrId}`)
+        .then(response => response.json())
+        .then(data => {
+            currentQRData = data.qr;
+            
+            // Llenar el formulario con los datos actuales
+            document.getElementById('qrId').value = qrId;
+            document.getElementById('nombre_qr').value = currentQRData.nombre;
+            document.getElementById('url').value = currentQRData.url;
+            document.getElementById('color').value = currentQRData.color;
+            document.getElementById('tamano').value = currentQRData.tamano;
+            
+            // Mostrar el modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        })
+        .catch(error => {
+            console.error('Error al obtener datos del QR:', error);
+            showToast('Error al cargar los datos del QR', 'error');
+        });
 }
 
+// Función para cerrar el modal
+function closeEditModal() {
+    const modal = document.getElementById('editModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    currentQRData = null;
+}
+
+// Función para manejar la actualización del QR
+async function handleEditSubmit(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const qrId = formData.get('qrId');
+    
+    const updateData = {
+        id_usuario: getCookie("userId"),
+        url: formData.get('url'),
+        nombre_qr: formData.get('nombre_qr'),
+        color: formData.get('color'),
+        tamano: parseInt(formData.get('tamano'))
+    };
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/edit-qr/${qrId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            showToast('QR actualizado exitosamente', 'success');
+            closeEditModal();
+            // Recargar la página para mostrar los cambios
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            throw new Error(result.message || 'Error al actualizar el QR');
+        }
+    } catch (error) {
+        console.error('Error al actualizar el QR:', error);
+        showToast('Error al actualizar el QR', 'error');
+    }
+}
+
+// Agregar los event listeners necesarios
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listener para el botón de editar en las tarjetas
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const qrId = button.getAttribute('data-id');
+            openEditModal(qrId);
+        });
+    });
+
+    // Event listeners para el modal
+    document.getElementById('closeModal').addEventListener('click', closeEditModal);
+    document.getElementById('cancelEdit').addEventListener('click', closeEditModal);
+    document.getElementById('editQRForm').addEventListener('submit', handleEditSubmit);
+
+    // Cerrar el modal si se hace clic fuera de él
+    document.getElementById('editModal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+            closeEditModal();
+        }
+    });
+});
 
 document.querySelector("#close_sec").addEventListener('click', cerrar_sesion)
-
 function cerrar_sesion() {
     // Obtener todas las cookies
     const cookies = document.cookie.split(";");
@@ -217,5 +331,5 @@ function cerrar_sesion() {
     setInterval(() => {
         location.href = "/"
     }, 2000);
-    
+
 }

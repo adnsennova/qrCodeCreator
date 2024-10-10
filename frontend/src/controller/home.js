@@ -22,8 +22,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     try {
         const response = await fetch(`http://localhost:3000/api/qrs/${id}`);
         const result = await response.json();
-        console.log(result.qrs);
-        
         if (response.ok) {
             const qrContainer = document.getElementById('qr-container');
             
@@ -35,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 `;
                 return;
             }
+            
 
             result.qrs.forEach(qr => {
                 const qrCard = document.createElement("div");
@@ -84,8 +83,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 // Generar el QR
                 new QRCode(document.getElementById(`qr_${qr.id}`), {
                     text: qr.url,
-                    width: 128,
-                    height: 128,
+                    width: qr.tamano,
+                    height: qr.tamano,
                     colorDark: qr.color,
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
