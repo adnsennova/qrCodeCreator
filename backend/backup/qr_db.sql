@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 10-10-2024 a las 18:11:05
+-- Tiempo de generación: 10-10-2024 a las 18:23:54
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.2.4
 
@@ -41,11 +41,18 @@ CREATE TABLE `qrs` (
 --
 
 INSERT INTO `qrs` (`id`, `nombre`, `url`, `color`, `id_usuario`, `tamano`) VALUES
-(1, 'hola', 'https://developers.google.com/chart?hl=es-419', '#814646', 1, NULL),
-(3, 'google', 'www.google.com', '#ab2b2b', 1, NULL),
-(6, 'mi perfil linkedin', 'https://www.linkedin.com/in/stiven-colorado-370028220/', '#26c030', 1, NULL),
-(9, 'agenda', 'https://serviciosempresariales.site/emprendeAgenda/frontend/pages/agendarCita.html', '#8b931b', 11, '500'),
-(10, 'chatgpt', 'https://chatgpt.com/c/6707e551-d890-800a-b6da-4c9f8acacbad', '#313031', 11, '300');
+(1, 'hola', 'https://developers.google.com/chart?hl=es-419', '#814646', 1, '300'),
+(2, 'google', 'https://www.google.com', '#ab2b2b', 1, '400'),
+(3, 'mi perfil linkedin', 'https://www.linkedin.com/in/stiven-colorado-370028', '#26c030', 1, '350'),
+(4, 'github', 'https://github.com/', '#333333', 1, '500'),
+(5, 'stackoverflow', 'https://stackoverflow.com/', '#f48024', 1, '450'),
+(6, 'python', 'https://www.python.org/', '#306998', 1, '320'),
+(7, 'mdn web docs', 'https://developer.mozilla.org/', '#0c59b6', 1, '360'),
+(8, 'Netflix', 'https://www.netflix.com', '#e50914', 11, '700'),
+(9, 'YouTube', 'https://www.youtube.com', '#FF0000', 11, '600'),
+(10, 'Spotify', 'https://www.spotify.com', '#1DB954', 11, '550'),
+(11, 'Twitch', 'https://www.twitch.tv', '#9146FF', 11, '500'),
+(12, 'Hulu', 'https://www.hulu.com', '#3DBB3D', 11, '450');
 
 -- --------------------------------------------------------
 
@@ -66,7 +73,6 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `nombre`, `correo`, `contrasena`) VALUES
 (1, 'stiven', 'stivenchoo@gmail.com', '$2a$10$wlxsOt5OWwjpNvPd3S6I/eVmKg1eczppFCRrMaEnO5zxS0kqNHEee'),
-(8, 'asdf', 'camilo@gmail.com', '$2a$10$p2PMxGojo5NVEygf/zTBAuUuzWPXJSKwoK/ipAmc3RB5Tmhl/WUUS'),
 (11, 'franyer', 'franyer@gmail.com', '$2b$10$rbYLXNKMU8IlO0f1drAsUuekn7yTVHAKIanSHTsroibNgoZ.xrCGK');
 
 --
@@ -94,7 +100,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `qrs`
 --
 ALTER TABLE `qrs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
