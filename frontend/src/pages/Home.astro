@@ -4,14 +4,16 @@ import { Image } from "astro:assets";
 import Navbar from "../components/Navbar.astro";
 import LayoutHome from "../layouts/Layout_home.astro";
 // Simulación de datos de usuario (en una aplicación real, esto vendría de una base de datos o API)
-const userName = ["Alice", "Bob", "Charlie", "David", "Eve"][
-    Math.floor(Math.random() * 5)
-];
 ---
+
 <script src="../controller/validate_session.js"></script>
 <!-- Primero cargar las librerías necesarias -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+    integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+<script src="../controller/getUser.js"></script>
 <script is:inline src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <link
     rel="stylesheet"
@@ -40,10 +42,15 @@ const userName = ["Alice", "Bob", "Charlie", "David", "Eve"][
                     />
                     <p
                         class="text-white text-lg font-medium text-center break-words w-full"
+                        id="email_profile"
+                    >
+                    </p>
+                    <p
+                        class="text-white text-lg font-medium text-center break-words w-full"
                         id="name_profile"
                     >
-                        {userName}
                     </p>
+                    
                     <button
                         id="close_sec"
                         class="text-red-600 hover:text-red-800 cursor-pointer text-lg font-medium text-center break-words w-full"

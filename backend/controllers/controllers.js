@@ -125,7 +125,7 @@ exports.validar_usuario = async (req, res) => {
 exports.crear_qr = async (req, res) => {
     const { id_usuario, url, nombre_qr, color = '#000000' } = req.body;
     console.log(id_usuario, url, nombre_qr, color);
-    
+
     try {
         // Verificar si el usuario existe
         const [userRows] = await pool.execute(
@@ -156,11 +156,11 @@ exports.crear_qr = async (req, res) => {
         // Respuesta exitosa
         res.status(201).json({
             message: 'QR creado y almacenado en la base de datos',
-            qr: { 
-                nombre: nombre_qr, 
-                url, 
-                color, 
-                id_usuario 
+            qr: {
+                nombre: nombre_qr,
+                url,
+                color,
+                id_usuario
             },
             id: result.insertId,
         });
@@ -195,6 +195,36 @@ exports.traer_qr = async (req, res) => {
         res.status(500).json({ message: 'Error al traer QR', error });
     }
 };
+exports.traer_usuario = async (req, res) => {
+    const { id_usuario } = req.params;
+
+    if (!id_usuario) {
+        return res.status(400).json({ message: `No se recibió un ID válido` });
+    }
+
+    try {
+        const [rows] = await pool.execute(
+            'SELECT id, nombre, correo FROM users WHERE id = ?',
+            [id_usuario]
+        );
+
+        if (rows.length > 0) {
+            return res.status(200).json({
+                message: `Se encontró el usuario con el ID => ${id_usuario}`,
+                id: id_usuario,
+                data: rows[0],
+            });
+        } else {
+            return res.status(404).json({ message: `Usuario no encontrado` });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Error en la base de datos',
+            error: error.message,
+        });
+    }
+};
+
 
 exports.obtener_qrs = async (req, res) => {
     const { id_usuario } = req.params;  // Suponemos que el id_usuario viene en los parámetros de la URL
@@ -225,7 +255,7 @@ exports.obtener_qrs = async (req, res) => {
 exports.eliminar_qr = async (req, res) => {
     const { id } = req.params;  // Suponemos que el ID del QR viene en los parámetros de la URL
     console.log(`id recibido en backend: ${id}`);
-    
+
     try {
         // Ejecutar la consulta para eliminar el QR
         const [result] = await pool.execute(

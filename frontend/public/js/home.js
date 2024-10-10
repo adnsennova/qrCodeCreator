@@ -192,3 +192,30 @@ function editQR(id) {
     console.log('Editar QR:', id);
     // Implementar lógica de edición
 }
+
+
+document.querySelector("#close_sec").addEventListener('click', cerrar_sesion)
+
+function cerrar_sesion() {
+    // Obtener todas las cookies
+    const cookies = document.cookie.split(";");
+
+    // Iterar sobre todas las cookies y eliminarlas
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+
+        // Borrar la cookie estableciendo la fecha de expiración en una pasada
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    }
+
+    // Aquí puedes añadir lógica adicional, como redirigir al usuario o mostrar un mensaje de cierre de sesión
+    console.log("Todas las cookies han sido eliminadas.");
+
+    showToast("cerrando sesion", "")
+    setInterval(() => {
+        location.href = "/"
+    }, 2000);
+    
+}
